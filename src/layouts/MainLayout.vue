@@ -331,7 +331,7 @@ lang: this.$i18n.locale,
           reward: 'Receive: 180 FREEOS'
         },
         {
-          name: 'Week 6',
+          name: 'Week 6', //delete
           minacc: 237,
           reward: 'Receive: 180 FREEOS'
         },
