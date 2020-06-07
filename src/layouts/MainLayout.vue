@@ -26,7 +26,7 @@
         <q-toolbar class="bg-primary text-white">
 
             <!-- <div class="col-xs-12 col-lg-3 "> -->
-              <div> <img src="../assets/Capture.jpg" width="200px" align="bottom"/> </div>
+              <div> <img src="../assets/unnamed.png" width="50px" align="bottom"/> </div>
               <q-space />
 
             <!-- <div class="row justify-end "> -->
@@ -55,8 +55,9 @@
         </q-toolbar>
       <!-- </q-toolbar> -->
 
-      <div class="text-center q-pa-md q-gutter-sm">
-        <img src="../assets/logo.png" class="rounded mx-auto d-block margin-top:37px" alt="..." width="15%" height="15%">
+      <div class="text-center q-pa-md q-gutter-sm; padding: 24px;">
+        <p class="bottom-three"></p>
+        <img src="../assets/download.png" class="rounded mx-auto d-block margin-top:37px;" alt="..." width="15%" height="15%">
         <h5 class="h5-responsive text-white">{{$t('motto')}}</h5>
         <div v-if="active">
         <q-btn
@@ -65,7 +66,8 @@
           size="lg"
           outline rounded
           style="color: #00BFFF"
-          @click="startComputing(2)"
+          
+          @click="getTableData()"
           label="CLAIM FREEOS" >
         </q-btn></div>
         <div v-else>
@@ -76,23 +78,36 @@
             disable
             label="CLAIM FREEOS" >
           </q-btn>
+            
         </div>
+        
       </div>
 
-      <div class="div-with-bg">
-        <div class="text-center q-pa-md text-area my-font" ref="rules">
-          <h5>Air Claim Rules</h5>
-      <p>{{$t('rules1')}}</p>
-      <p>{{$t('rules2')}}</p>
-      <p>{{$t('rules3')}}</p>
+    <div id="q-app">
+      <div class="flex flex-center column">
+        <div id="parent" class="full-width row wrap justify-center items-baseline content-center" style="overflow: hidden; padding: 24px;">
+          <div class="col-9 q-col-gutter-x-xl div-with-bg" style="overflow: auto;">
+            <q-card class="div-with-bg">
+              <q-card-section>
+                <h5>Air Claim Rules</h5>
+                <p style="font-size:18px;">{{$t('rules1')}}</p>
+                <p style="font-size:18px;">{{$t('rules2')}}</p>
+                <p style="font-size:18px;">{{$t('rules3')}}</p>
+                <p>{{data1}}  </p>
+              </q-card-section>
+            </q-card>
+          </div>
         </div>
       </div>
+    </div>
+
+
 
       <q-card-section>
         <div class="q-pa-md">
           <q-table
             dense
-            :data="data1"
+            :data = "data1"
             :columns="columns"
             row-key="name"
             color="amber"
@@ -101,51 +116,36 @@
       </q-card-section>
 
 
-      <div class="q-pa-md" style="max-width: 95%" ref="what">
-
-      <q-list bordered class="rounded-borders div-with-bg text-area">
+<div class="flex flex-center column">
+        <div id="parent" class="full-width row wrap justify-center items-baseline content-center" style="overflow: hidden; padding: 24px;">
+          <div class="col-9 q-col-gutter-x-xl div-with-bg" style="overflow: auto;">
+                
+<q-list class="col-9 q-col-gutter-x-xl div-with-bg" style="overflow: auto;">
         <h5 class="text-center">What is FREEOS?</h5>
-        <q-expansion-item
+        <q-expansion-item style="font-size:20px;"
           switch-toggle-side
           expand-separator
           label="A Citizenship into a Free and Democratic Economy"
         >
-          <q-card>
-            <q-card-section class="text-center">
-              <p>FREEOS stands for freedom. It is a tool for economic freedom
-              that represents a fairer—more free—alternative to a central bank.
-              It includes—through voting—the freedom to directly determine one’s
-                economic well-being. We call this the Direct Economy.</p>
-
-              <p>FREEOS can be likened to entry to a borderless, globally distributed
-              nation with a policy of Universal Basic Income that comes with two
-              basic conditions: that one has a basic economic stake in the nation,
-              and that one participates in the Direct Economy through voting.
-              Through a weekly voting process, each FREEOS citizen participates
-              in an open series of polls, followed by voting on the economic
-              controls of the FREEOS currency. At the end of the vote, any
-              FREEOS minted into existence is evenly distributed to all
-                participants depending on their level of participation.</p>
+          <q-card class="div-with-bg">
+            <q-card-section class="">
+              <p style="font-size:18px;">{{$t('comment1')}}</p>
+              <p style="font-size:18px;">{{$t('comment2')}}</p>
+              <p style="font-size:18px;">{{$t('comment3')}}</p>
             </q-card-section>
           </q-card>
         </q-expansion-item>
-        <q-expansion-item
+        <q-expansion-item style="font-size:20px;"
           switch-toggle-side
           expand-separator
           label="A Responsible Universal Basic Income (UBI) that is not merely a
           hand-out"
         >
-          <q-card>
-            <q-card-section class="text-center my-font">
-              <p>FREEOS exists to help free us. To take responsibility for our
-              individual economic freedom—as well as our collective freedom.
-              This project intends to provide a tangible mean to help lift
-              ourselves and others up into economic freedom and well-being equally.
-              This version of UBI is not merely a centrally-directed hand-out.
-              It requires responsibility and participation—through a series of
-              questions and votes— making it more of a "hand-in-hand" than a
-                "hand-out".</p>
-              <p>FREEOS is a grand experiment in whether the levers and control of an
+          <q-card class="div-with-bg">
+            <q-card-section>
+               <p style="font-size:18px;">{{$t('comment4')}}</p>
+              
+              <p class="font-size:18px;">FREEOS is a grand experiment in whether the levers and control of an
               economy can be handed over to the people, with some mathematical-based
               constraints and safety measures—to provide the tools for responsible,
               economic self-management <i>en masse</i>. It is the belief that people will
@@ -155,13 +155,13 @@
           </q-card>
         </q-expansion-item>
 
-        <q-expansion-item
+        <q-expansion-item style="font-size:20px;"
           switch-toggle-side
           expand-separator
           label="FREEOS is Freedom—for All of Us"
         >
-          <q-card>
-            <q-card-section class="text-center">
+          <q-card class="div-with-bg">
+            <q-card-section>
               <p>FREEOS is not simply freedom for freedom’s sake. It is not merely a
                 rallying cry. It does not just represent “freedom from”. Instead, it
                 represents “freedom for”. Freedom for determining the economic well-being
@@ -172,6 +172,21 @@
         </q-expansion-item>
       </q-list>
 
+          </div>
+        </div>
+      </div>
+
+
+
+
+
+
+
+
+
+
+      <div class="q-pa-md" style="max-width: 85%" ref="what">
+      
       </div>
 
       <div class="text-center">
@@ -249,7 +264,10 @@
 
 <script>
   import { openURL } from "quasar";
+  import axios from "axios";
   import { mapGetters } from "vuex";
+  import data1 from './datatab.json'
+//<!-- @click="startComputing(2)" -->
   export default {
   name: 'MyLayout',
   data () {
@@ -259,15 +277,15 @@
       onsubscribemsg: "",
       loading: false,
       langs: [
-{
-label: 'German',
-value: 'de'
-},
-{
-label: 'US English',
-value: 'en-us'
-}
-],
+    {
+    label: 'German',
+    value: 'de'
+    },
+    {
+    label: 'US English',
+    value: 'en-us'
+    }
+    ],
 lang: this.$i18n.locale,
       leftDrawerOpen: this.$q.platform.is.desktop,
       loading2: false,
@@ -295,68 +313,17 @@ lang: this.$i18n.locale,
 
       columns: [
         {
-          name: 'week',
+          name: 'id',
           required: true,
           label: 'Claim',
           align: 'left',
-          field: row => row.name
+          field: 'id'
         },
-        { name: 'minacc', align: 'center', label: 'HODL Requirement', field: 'minacc' },
-        { name: 'reward', label: 'Reward', field: 'reward' }
+        { name: 'email', align: 'center', label: 'HODL Requirement', field: 'email' },
+        { name: 'first_name', label: 'Reward', field: 'first_name' }
       ],
-      data1: [
-        {
-          name: 'Week 1',
-          minacc: 'Hold: 100 KARMA',
-          reward: 'Receive: 180 FREEOS'
-        },
-        {
-          name: 'Week 2',
-          minacc: 'Hold: 237 FREEOS',
-          reward: 'Receive: 180 FREEOS'
-        },
-        {
-          name: 'Week 3',
-          minacc: 'Hold: 237 FREEOS',
-          reward: 'Receive: 180 FREEOS'
-        },
-        {
-          name: 'Week 4',
-          minacc: 'Hold: 237 FREEOS',
-          reward: 'Receive: 180 FREEOS'
-        },
-        {
-          name: 'Week 5',
-          minacc: 'Hold: 237 FREEOS',
-          reward: 'Receive: 180 FREEOS'
-        },
-        {
-          name: 'Week 6', //delete
-          minacc: 237,
-          reward: 'Receive: 180 FREEOS'
-        },
-        {
-          name: 'Week 7',
-          minacc: 'Hold: 237 FREEOS',
-          reward: 9.0
-        },
-        {
-          name: 'Week 8',
-          minacc: 237,
-          reward: 9.0
-        },
-        {
-          name: 'Week 9',
-          minacc: 237,
-          reward: 9.0
-        },
-        {
-          name: 'Week 10',
-          minacc: 262,
-          reward: 16.0
-        }]
-    }
-  },
+      data1: []
+    }},
 
   watch: {
     lang(lang) {
@@ -367,15 +334,38 @@ lang: this.$i18n.locale,
       })
     }
   },
-
-  computed: {
-    contentSize () {
-      return this.moreContent ? 150 : 5
-    },
-        ...mapGetters({
-      getAccountName: "user/getAccountName"
-    })
+  
+  //computed: {
+  //  contentSize () {
+  //    return this.moreContent ? 150 : 5
+  //  },
+  //      ...mapGetters({
+  //    //getAccountName: "user/getAccountName"
+  //  })
+  //},
+  mounted() {
+    //this.loading = true;
+      //  axios.get("datatab.json").then(response => (this.data1 = response.data));
+    axios
+      .get('../statics/rawdata.json')
+      .then(response => (this.data1 = response.data.data))
+      .catch(error => console.log(error))
+    //  .finally(() => this.loading = false)
+    this.showNotif()
+    console.log('*** OK there ***')
   },
+
+  //  created() {
+  //      $.getJSON('http://freeos.online/datatab.json',function(json){
+  //        console.log('Entered inside');
+  //        this.data1 = new vis.DataSet([json]);
+  //        console.log(json);
+  //      });
+  //  },
+
+
+
+
   methods: {
     goto(refName) {
       let element = this.$refs[refName];
@@ -383,16 +373,23 @@ lang: this.$i18n.locale,
       let top = element.offsetTop;
       window.scrollTo(0, top);
     },
+    getTableData() {
+       fetch("http://freeos.online/datatab.json")
+        .then(response => response.json())
+        .then(data => (this.data1 = data.data));
+         console.log(' A QQ')
+    },
+  
     openURL,
-    login() {
-      console.log("Login Started")
-      
-      this.$store.dispatch("global/login");
-      this.showNotif()
-    },
-    logout() {
-      this.$store.dispatch("global/logout");
-    },
+    //login() {
+    //  console.log("Login Started")
+    //  
+    //  this.$store.dispatch("global/login");
+    //  this.showNotif()
+    //},
+    //logout() {
+    //  this.$store.dispatch("global/logout");
+    //},
     changeLang( lang ){
       this.$i18n.locale = lang
     },
@@ -428,12 +425,24 @@ lang: this.$i18n.locale,
 
 <style>
 
+#site-container {
+    margin: 0px auto;
+    text-align: left;
+    width: 700px;
+    zoom: 1;
+    position: relative;
+}
+
   @font-face {
     font-family: 'MyWebFont';
     src: url('../assets/Franklin Gothic Medium Regular/Franklin Gothic Medium Regular.ttf')  format('truetype');
   }
   .my-font {
     font-family:'MyWebFont'
+  }
+
+  .bottom-three {
+     margin-bottom: 1cm;
   }
 
   ul {
@@ -492,4 +501,9 @@ lang: this.$i18n.locale,
     width: 100%;
   }
 
+  #content {
+    width: 990px;
+    margin-left: 127px;
+    margin-right: 127px;
+  }
 </style>
