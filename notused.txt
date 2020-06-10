@@ -1,0 +1,35 @@
+//from MainLayout.vue of claim 
+
+
+
+   getTableData() {
+       fetch("http://freeos.online/datatab.json")
+        .then(response => response.json())
+        .then(data => (this.data1 = data.data));
+         console.log(' A QQ')
+    },
+
+
+    created() {
+        $.getJSON('http://freeos.online/datatab.json',function(json){
+          console.log('Entered inside');
+          this.data1 = new vis.DataSet([json]);
+          console.log(json);
+        });
+    },
+
+
+<q-btn
+          :loading="loading2"
+          :percentage="percentage2"
+          size="lg"
+          outline rounded
+          style="color: #00BFFF"
+          
+          @click="getTableData()"
+          //<!-- @click="startComputing(2)" -->
+          label="CLAIM FREEOS" >
+        </q-btn>
+
+
+

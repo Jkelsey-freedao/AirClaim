@@ -3,47 +3,74 @@
 
   <div id="q-app" ref="home">
     <div>
-      <q-toolbar class="col-8 bg-grey-3">
-
-
-
-
-
-        <q-toolbar-title class="a">{{$t('hello')}} freeosfreeos (TEST WEBSITE)</q-toolbar-title>
-        <q-select
-              label="Select"
-              v-model="lang"
-              map-options
-              :options="langs"
-              />
-
-
-        
+<!--      <q-toolbar class="col-8 bg-grey-3">
+      <q-toolbar-title class="a">{{$t('hello')}} freeosfreeos (TEST WEBSITE)</q-toolbar-title>
+      <q-select
+        label="Select"
+        v-model="lang"
+        map-options
+        :options="langs"
+        />
       </q-toolbar>
-
+-->
       <!-- <q-toolbar class="col-4 bg-primary text-white"> -->
 
         <q-toolbar class="bg-primary text-white">
 
             <!-- <div class="col-xs-12 col-lg-3 "> -->
-              <div> <img src="../assets/unnamed.png" width="50px" align="bottom"/> </div>
+              <div> <img src="../assets/unnamed.png" width="50px" align="bottom"/>
+                  <div v-if="state.accountInfo">
+                     <q-btn @click="logout" style="margin-bottom:20px;" :disabled="mobileWallet">
+                      {{ wallet.accountInfo.account_name }} <i v-show="!mobileWallet" style="margin-left:5px;" class="el-icon-close"></i>
+                      :{{state.accountInfo.core_liquid_balance}}
+                     </q-btn>
+                  </div> 
+              </div>
               <q-space />
 
             <!-- <div class="row justify-end "> -->
-              <q-btn
-                v-if="!getAccountName"
-                size="md"
-                color="primary"
-                :label="$t('signin')"
-                @click="login"
-              />
-              <q-btn
-                v-else
-                size="md"
-                color="primary"
-                :label="$t('signout')"
-                @click="logout"
-              />
+   <!-- Login dropdown (if logged out)-->
+   <!--
+              <div v-if="!state.accountInfo && !mobileWallet">
+                <el-dropdown trigger="click">
+                  <el-button :loading="progress">
+                    {{$t("Login")}} <i class="el-icon-arrow-down el-icon--right"></i>
+                  </el-button>
+                 <el-dropdown-menu slot="dropdown">
+                   <el-dropdown-item>
+                     <div @click="connectWallet('scatter')">
+                       <img style="width:24px;height:auto;margin-right:2px;" src="../assets/scatter_logo.jpg"/>
+                       <img style="width:75px;height:auto;margin-bottom: -5px;" src="../assets/scatter.png"/>
+                     </div>
+                   </el-dropdown-item>
+                   <el-dropdown-item>
+                      <div style="padding-top:15px;" @click="connectWallet('ledger')">
+                        <img style="" src="../assets/ledger.svg"/>
+                      </div>
+                   </el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
+              </div>
+-->
+    <div v-if="!state.accountInfo && !mobileWallet">
+      <q-btn color="primary" label="LOGIN">
+        <q-menu
+          transition-show="jump-down"
+          transition-hide="jump-up"
+        >
+          <q-list style="min-width: 100px">
+            <q-item clickable>
+                  <div @click="connectWallet('scatter')">scatter</div>
+            </q-item>
+            <q-item clickable>
+                 <div style="padding-top:15px;" @click="connectWallet('ledger')">ledger</div>       
+            </q-item>
+          </q-list>
+        </q-menu>
+      </q-btn>
+    </div>
+
+
 
           <q-btn flat style="color: #00BFFF"  @click="goto('rules')" label="Rules" ></q-btn>
           <q-btn flat style="color: #00BFFF" @click="goto('what')" label="What is FREEOS?" ></q-btn>
@@ -66,8 +93,7 @@
           size="lg"
           outline rounded
           style="color: #00BFFF"
-          
-          @click="getTableData()"
+          @click="startComputing(2)"
           label="CLAIM FREEOS" >
         </q-btn></div>
         <div v-else>
@@ -78,10 +104,16 @@
             disable
             label="CLAIM FREEOS" >
           </q-btn>
-            
-        </div>
-        
+        </div>      
       </div>
+
+
+          <div v-if="state.accountInfo">
+            <q-btn @click="logout" style="margin-bottom:20px;" :disabled="mobileWallet">
+                {{ wallet.accountInfo.account_name }} <i v-show="!mobileWallet" style="margin-left:5px;" class="el-icon-close"></i>
+            </q-btn><br> 
+            <p style="color:grey;">Balance: {{state.accountInfo.core_liquid_balance}}</p>
+          </div> 
 
     <div id="q-app">
       <div class="flex flex-center column">
@@ -263,15 +295,37 @@
 </template>
 
 <script>
+import { initAccessContext } from "eos-transit";
+import scatter from "eos-transit-scatter-provider";
+import ledger from "eos-transit-ledger-provider";
+import lynx from "eos-transit-lynx-provider";
+import tp from 'eos-transit-tokenpocket-provider';
+import meetone from 'eos-transit-meetone-provider';
+//import { setTimeout } from 'timers';
+
+
   import { openURL } from "quasar";
   import axios from "axios";
   import { mapGetters } from "vuex";
-  import data1 from './datatab.json'
-//<!-- @click="startComputing(2)" -->
+  import data1 from './datatab.json';
+  //import { Notify } from 'quasar';
+
   export default {
   name: 'MyLayout',
   data () {
     return {
+      active: true, //Claim Active?
+      nav: navigator.userAgent,
+      mobileWallet: false,
+      accountsModal: false,
+      finishedVoting: false,
+      message: {},
+      accessContext: null,
+      wallet: null,
+      state:{},
+      walletId: "scatter",
+      discoveryData: [],
+
       email_address: "",
       language: "",
       onsubscribemsg: "",
@@ -311,19 +365,47 @@ lang: this.$i18n.locale,
       ],
 
 
-      columns: [
+      columns: [  //need to be rewritten for the correct table, also verify json format of the data table TODO 
         {
           name: 'id',
           required: true,
-          label: 'Claim',
+          label: 'Week',
           align: 'left',
           field: 'id'
         },
-        { name: 'email', align: 'center', label: 'HODL Requirement', field: 'email' },
+        { name: 'email', align: 'center', label: 'HODL Requirement', field: 'email' },  //actually wrong TODO
         { name: 'first_name', label: 'Reward', field: 'first_name' }
       ],
       data1: []
     }},
+
+  created() {
+    //if client is using mobile wallet (Now set for Lynx)
+    if (navigator.userAgent.toLowerCase().includes('eoslynx')){
+      this.mobileWallet = true;
+      this.walletId = 'EOS Lynx';
+      //if lynxMobile is already loaded, initialize transit
+      if (window.lynxMobile) this.initTransit();
+      //otherwise wait for lynxMobile to load first
+      else window.addEventListener("lynxMobileLoaded", ()=> this.initTransit());
+    } 
+    else if (navigator.userAgent.toLowerCase().includes('tokenpocket')){
+      this.mobileWallet = true;
+      this.walletId = 'TokenPocket';
+      //if TokenPocket is already loaded, initialize transit
+      if (window.scatter) this.initTransit();
+      //otherwise wait for TokenPocket to load
+      else window.addEventListener("scatterLoaded", ()=> this.initTransit());
+    } 
+    else if (navigator.userAgent.toLowerCase().includes('meet.one')){
+      this.mobileWallet = true;
+      this.walletId = 'meetone_provider';
+      // initialize transit with Meet.One wallet (transit will wait for window.scatter to load)
+      this.initTransit();
+    } 
+    //if client is not using a mobile wallet
+    else this.initTransit();
+  },  
 
   watch: {
     lang(lang) {
@@ -332,17 +414,48 @@ lang: this.$i18n.locale,
       import(`quasar/lang/${lang.value}`).then(language => {
         this.$q.lang.set(language.default)
       })
+    },
+    state(val){
+      //watching state variable to provide custom notifications to user
+      if(!val.connecting && this.message.connecting && this.walletId!=='ledger')  
+        this.message.connecting.close();
+      if(this.message.authenticating) 
+        this.message.authenticating.close();
+      if (val.connecting)
+        {this.message.connecting = this.$notify.info({title: "Connecting", message: `Connecting to ${this.walletId}`,duration: 0});
+           this.$q.notify({message: 'Connecting to xxx', color:'blue'})
+        }
+      else if (val.authenticating)
+        {this.message.authenticating = this.$notify.info({title: "Authenticating", message: `Logging in to ${this.walletId}`, duration: 0});
+           this.$q.notify({message: 'Authenticating. Logging in to xxx', color:'blue'})
+        }   
+      else if (val.authenticationError)
+        this.$notify.error({title: "Authentication Error", message: val.authenticationErrorMessage, duration: 5000,});
+      else if (val.connectionError)
+        this.$notify.error({title: "Connection Error", message: val.connectionErrorMessage, duration: 5000});
+      else if(val.accountInfo){
+        if( this.message.accountInfo) this.message.accountInfo.close();
+        this.message.accountInfo = this.$notify.success({title: "Success", message: `Logged in successfully as ${val.accountInfo.account_name}`, duration: 3000});
+        this.accountsModal = false;
+        //once user logs in successfully with scatter, save variable to localstorage to allow auto login
+        localStorage.autoLogin = this.walletId;
+      }
     }
   },
   
-  //computed: {
-  //  contentSize () {
-  //    return this.moreContent ? 150 : 5
-  //  },
-  //      ...mapGetters({
-  //    //getAccountName: "user/getAccountName"
-  //  })
-  //},
+  computed: {    
+    //reactive accounts list of all discovered public keys
+    accounts() {
+      var list = [];
+      if (this.discoveryData.keyToAccountMap)
+        for (var key of this.discoveryData.keyToAccountMap)
+          if (key.accounts && key.accounts[0]) 
+            list.push(key);
+      return list;
+    },
+    progress(){return this.state.connecting || this.state.authenticating || this.state.fetchingAccount || false}
+  },
+
   mounted() {
     //this.loading = true;
       //  axios.get("datatab.json").then(response => (this.data1 = response.data));
@@ -355,17 +468,6 @@ lang: this.$i18n.locale,
     console.log('*** OK there ***')
   },
 
-  //  created() {
-  //      $.getJSON('http://freeos.online/datatab.json',function(json){
-  //        console.log('Entered inside');
-  //        this.data1 = new vis.DataSet([json]);
-  //        console.log(json);
-  //      });
-  //  },
-
-
-
-
   methods: {
     goto(refName) {
       let element = this.$refs[refName];
@@ -373,11 +475,103 @@ lang: this.$i18n.locale,
       let top = element.offsetTop;
       window.scrollTo(0, top);
     },
-    getTableData() {
-       fetch("http://freeos.online/datatab.json")
-        .then(response => response.json())
-        .then(data => (this.data1 = data.data));
-         console.log(' A QQ')
+
+initTransit(){
+      var options = {
+	  
+		  appName: "quizinfo1234",
+          network: {
+          blockchain:'eos',
+          protocol:'https',
+          host:'api-kylin.eosasia.one',
+          port:443,
+          chainId:'5fff1dae8dc8e2fc4d5b23b2c7665c97f9e9d8edf2b6485a86ba311c25639191'
+        }
+      }
+      //set desired wallet providers
+      if (this.mobileWallet) options.walletProviders = [lynx(), tp(), meetone()];
+      else options.walletProviders = [scatter(), ledger()];
+
+      //initialize Transit with the options object
+      this.accessContext = initAccessContext(options);
+      
+      //Auto connect and login if user is on a mobile wallet
+      if (this.mobileWallet) this.connectWallet(this.walletId);
+
+      //auto login to last wallet if user never logged out
+      else if (localStorage.autoLogin) this.connectWallet(localStorage.autoLogin);
+
+    },
+
+    async discoverMore(n) {
+      for (var i=1;i<n;i++)
+        this.discoveryData = await this.wallet.discover({pathIndexList: [i]});
+    },
+
+    connectWallet(walletId) {
+      this.walletId = walletId;
+
+      //fetch provider using the walletId;
+      let provider = this.accessContext.getWalletProviders().find(r=>{return r.id==walletId;});
+      if (!provider) return;
+
+      // initialize Transit wallet instance with your desired signature provider
+      this.wallet = this.accessContext.initWallet(provider);
+
+      //Subscrible to Transit wallet changes and bind it to a vue variable
+      this.wallet.subscribe(walletState =>this.state = walletState);
+
+      this.startLogin(walletId);
+    },
+
+    async startLogin() {
+      //Connect to wallet provider
+      await this.wallet.connect();
+
+      try{
+        //start public key discovery for first index
+        this.discoveryData = await this.wallet.discover({pathIndexList: [0]});
+
+        //if wallet does not provide public keys (eg. scatter), proceed to login
+        if (this.discoveryData.keyToAccountMap.length == 0) 
+          await this.wallet.login();
+
+        //if wallet provides one or more public keys (eg. ledger), allow user to choose desired account
+        else {
+          this.accountsModal = true;
+          this.message.connecting.close();
+          this.message.authenticating = this.$notify.info({
+            title: "Authenticating", message: `Choose account on ${this.walletId}`,duration: 0
+          });
+          //start async discovery on additional indices
+          this.discoverMore(10);
+        }
+      }catch(ex){
+        this.message.connecting.close();
+        if (this.walletId =='ledger')
+          this.$q.notify.error({
+            title: "Error", message: 'Cannot connect to Ledger' ,duration: 5000
+          });
+        this.ShowNotif();
+
+
+
+      }
+    },
+    async accountLogin(index=0, accountIndex=0) {
+      var keyObj = this.discoveryData.keyToAccountMap[index];
+      await this.wallet.login(keyObj.accounts[accountIndex].account, keyObj.accounts[accountIndex].authorization);
+      this.message.authenticating.close();
+    },
+    async logout() {
+      //null autologin
+      localStorage.removeItem('autoLogin');
+      this.message.logout = this.$notify.info({title: "Logging out", duration: 0});
+      await this.wallet.terminate();
+      this.message.logout.close();
+      this.message.logout = this.$notify.success({
+        title: "You have logged out successfully", duration: 3000
+      });
     },
   
     openURL,
@@ -390,6 +584,7 @@ lang: this.$i18n.locale,
     //logout() {
     //  this.$store.dispatch("global/logout");
     //},
+
     changeLang( lang ){
       this.$i18n.locale = lang
     },
