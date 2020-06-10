@@ -294,7 +294,7 @@
 
 </template>
 
-<script>
+<script>  //Version 10 th July
 import { initAccessContext } from "eos-transit";
 import scatter from "eos-transit-scatter-provider";
 import ledger from "eos-transit-ledger-provider";
