@@ -3,7 +3,8 @@
 
   <div id="q-app" ref="home">
     <div>
-<!--      <q-toolbar class="col-8 bg-grey-3">
+  <!--
+      <q-toolbar class="col-8 bg-grey-3">
       <q-toolbar-title class="a">{{$t('hello')}} freeosfreeos (TEST WEBSITE)</q-toolbar-title>
       <q-select
         label="Select"
@@ -18,9 +19,17 @@
         <q-toolbar class="bg-primary text-white">
 
             <!-- <div class="col-xs-12 col-lg-3 "> -->
-              <div> <img src="../assets/unnamed.png" width="50px" alt=""/>
+              <div class="pex1"> <img src="../assets/unnamed.png" width="50px" alt="" />
               </div>
-              <q-space />
+
+          <q-select
+            label="Select"
+            v-model="lang"
+            map-options
+            :options="langs"
+          />
+
+             <q-space />
 
              <div v-if="!state.accountInfo && !mobileWallet">
                <q-btn color="primary" label="LOGIN">
@@ -84,9 +93,9 @@
       </q-btn>
       </div>
 
-    <div id="q-app">
+    <div id="q-app1">
       <div class="flex flex-center column">
-        <div id="parent" class="full-width row wrap justify-center items-baseline content-center" style="overflow: hidden; padding: 24px;">
+        <div id="parent1" class="full-width row wrap justify-center items-baseline content-center" style="overflow: hidden; padding: 24px;">
           <div class="col-9 q-col-gutter-x-xl div-with-bg" style="overflow: auto;">
             <q-card class="div-with-bg">
               <q-card-section>
@@ -104,7 +113,7 @@
 
 
 
-      <q-card-section>
+      <q-card-section class="flex flex-center column">
         <div class="q-pa-md">
           <q-table
             dense
@@ -177,15 +186,6 @@
         </div>
       </div>
 
-
-
-
-
-
-
-
-
-
       <div class="q-pa-md" style="max-width: 85%" ref="what">
 
       </div>
@@ -203,8 +203,6 @@
         <q-btn round size="sm" color="blue" icon="ion-logo-linkedin"></q-btn>
         <q-btn round size="sm" color="blue" icon="ion-paper-plane"></q-btn>
       </div>
-
-
 
       <q-dialog v-model="layout" persistent>
         <q-layout view="Lhh lpR fff" container class="bg-white">
@@ -292,7 +290,7 @@ import meetone from 'eos-transit-meetone-provider';
       accessContext: null,
       wallet: null,
       state:{},
-      walletId: "scatter",
+      walletId: "",
       discoveryData: [],
 
       email_address: "",
@@ -387,23 +385,20 @@ lang: this.$i18n.locale,
       //watching state variable to provide custom notifications to user
       if(!val.connecting && this.message.connecting && this.walletId!=='ledger')
         this.message.connecting = false;
-      if(this.message.authenticating)
-        this.message.authenticating = false;
       if (val.connecting)
         {this.message.connecting = true;
-          this.$q.notify({message: 'Connecting: Connecting to ${this.walletId}', type:'info', duration: 3000});
+          this.$q.notify({message: 'Connecting to '+this.walletId, type:'info', duration: 3000});
         }
       else if (val.authenticating)
-        {this.message.authenticating = true;
-          this.$q.notify({message: 'Authenticating: Logging in to ${this.walletId}', type: 'info', duration: 3000});
+        {
+          this.$q.notify({message: 'Authenticating: Logging in to '+this.walletId, type: 'info', duration: 3000});
         }
       else if (val.authenticationError)
-        this.$q.notify({message: 'Authentication Error: ${val.authenticationErrorMessage}', type:'negative', duration: 5000,});
+        this.$q.notify({message: 'Authentication Error: '+val.authenticationErrorMessage, type:'negative', duration: 5000,});
       else if (val.connectionError)
-        this.$q.notify.error({message: 'Connection Error": ${val.connectionErrorMessage}', type:'negative', duration: 5000});
+        this.$q.notify({message: 'Connection Error: '+val.connectionErrorMessage, type:'negative', duration: 5000});
       else if(val.accountInfo){
-        if( this.message.accountInfo) this.message.accountInfo = false;
-        this.message.accountInfo = true; this.$q.notify({message: 'Success: Logged in successfully as ${val.accountInfo.account_name}', type:'positive', duration: 3000});
+        this.$q.notify({message: 'Success: Logged in successfully as '+val.accountInfo.account_name, type:'positive', duration: 3000});
         this.accountsModal = false;
         //once user logs in successfully with scatter, save variable to localstorage to allow auto login
         localStorage.autoLogin = this.walletId;
@@ -507,15 +502,15 @@ initTransit(){
         //if wallet provides one or more public keys (eg. ledger), allow user to choose desired account
         else {
           this.accountsModal = true;
-          this.message.connecting = 'false'; // needed ??
-          this.message.authenticating = 'true'; // needed ??
-            this.$q.notify({ message: 'Authenticating: Choose account on ${this.walletId}', type: 'info', duration: 0
+          this.message.connecting = false; // needed ??
+          this.message.authenticating = true; // needed ??
+            this.$q.notify({ message: 'Authenticating: Choose account on ${this.walletId}', type: 'info', duration: 3000
           });
           //start async discovery on additional indices
           await this.discoverMore(10);
         }
       }catch(ex){
-        this.message.connecting = 'false'; //needed?
+        this.message.connecting = false; //needed?
         if (this.walletId === 'ledger')
           this.$q.notify({ message: 'Cannot connect to Ledger', type: 'negative' ,duration: 5000
           });
@@ -525,14 +520,15 @@ initTransit(){
     async accountLogin(index=0, accountIndex=0) {
       let keyObj = this.discoveryData.keyToAccountMap[index];
       await this.wallet.login(keyObj.accounts[accountIndex].account, keyObj.accounts[accountIndex].authorization);
-      this.message.authenticating = 'false'; // needed ??
+      this.message.authenticating = false; // needed ??
     },
 
     async logout() {
       //null autologin
       localStorage.removeItem('autoLogin');
-      this.$q.notify({ message: "Logging out", type:'info', duration: 0});
+      const dismiss1 = this.$q.notify({ message: "Logging out", type:'info', duration: 0});
       await this.wallet.terminate();
+      dismiss1();
       this.$q.notify({ message: "You have logged out successfully", type:'positive', duration: 3000
       });
     },
@@ -591,6 +587,10 @@ initTransit(){
   }
   .my-font {
     font-family:'MyWebFont'
+  }
+
+  .pex1{
+    padding-right: 2em;
   }
 
   .bottom-three {
