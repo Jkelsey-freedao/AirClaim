@@ -192,16 +192,16 @@
 
       <div class="text-center">
         <h6 class="h6-responsive text-white">For more information on FREEOS, go to: <a href="http://freeos.io">freeos.io</a></h6>
-        <q-btn flat dense size="12px" style="color: #00BFFF"  @click="goto('home')" label="Home" ></q-btn>
+        <q-btn flat dense size="12px" style="color: #00BFFF" @click="goto('home')" label="Home" ></q-btn>
         <q-btn flat dense style="color: #00BFFF" size="12px" @click="goto('rules')" label="Claim Rules" ></q-btn>
         <q-btn flat dense style="color: #00BFFF" size="12px" @click="goto('what')" label="What is FREEOS?" ></q-btn>
       </div>
       <div class="text-center q-pa-md q-gutter-sm">
-        <q-btn round size="sm" color="blue" icon="ion-logo-twitter"></q-btn>
-        <q-btn round size="sm" color="blue" icon="ion-logo-github"></q-btn>
-        <q-btn round size="sm" color="blue" icon="ion-logo-reddit"></q-btn>
-        <q-btn round size="sm" color="blue" icon="ion-logo-linkedin"></q-btn>
-        <q-btn round size="sm" color="blue" icon="ion-paper-plane"></q-btn>
+        <q-btn round size="md" color="blue" icon="ion-logo-twitter"></q-btn>
+        <q-btn round size="md" color="blue" icon="ion-logo-github"></q-btn>
+        <q-btn round size="md" color="blue" icon="ion-logo-reddit"></q-btn>
+        <q-btn round size="md" color="blue" icon="ion-logo-linkedin"></q-btn>
+        <q-btn round size="md" color="blue" icon="ion-paper-plane"></q-btn>
       </div>
 
       <q-dialog v-model="layout" persistent>
@@ -441,14 +441,30 @@ lang: this.$i18n.locale,
 initTransit(){
       var options = {
 
-		  appName: "quizinfo1234",
-          network: {
-          blockchain:'eos',
-          protocol:'https',
-          host:'api-kylin.eosasia.one',
-          port:443,
-          chainId:'5fff1dae8dc8e2fc4d5b23b2c7665c97f9e9d8edf2b6485a86ba311c25639191'
+        appName: "quizinfo1234",
+        network: {
+        blockchain: 'eos',
+        protocol: 'https',
+        host: 'api-kylin.eosasia.one',
+        port: 443,
+        chainId: '5fff1dae8dc8e2fc4d5b23b2c7665c97f9e9d8edf2b6485a86ba311c25639191'
         }
+
+
+  //{
+    //chainId: 'e70aaab8997e1dfce58fbfac80cbbb8fecec7b99cf982a9444273cbc64c41473'
+    //e70aaab8997e1dfce58fbfac80cbbb8fecec7b99cf982a9444273cbc64c41473
+    //https://jungle2.cryptolions.io:443
+  //}
+
+
+      ///  network: {
+      ///    blockchain: 'telos',
+      ///    protocol: 'https',
+      ///    host: 'telos-testnet-b.eosphere.io',
+      ///    port: 443,
+      ///    chainId: '1eaa0824707c8c16bd25145493bf062aecddfeb56c736f6ba6397f3195f33c9f'
+      ///  }
       }
       //set desired wallet providers
       if (this.mobileWallet) options.walletProviders = [lynx(), tp(), meetone()];
